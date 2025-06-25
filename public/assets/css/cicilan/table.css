@@ -1,0 +1,55 @@
+.result-box {
+    background-color: #f0f1ff;
+    border: 1px solid #c0c0c0;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.table-title {
+    background-color: #0d6efd;
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.table-content {
+    background-color: #f0f1ff;
+    padding: 10px;
+    color: black;
+    font-size: 16px;
+}
+
+.important-value {
+    font-weight: bold;
+}
+
+.btn-primary {
+    margin-top: 20px;
+    margin-bottom: auto;
+}
+
+.result {
+    margin-top: 30px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    margin: auto;
+}
+
+.form-group {
+    margin-top: 10px;
+}
+
+#submitLoanId {
+    margin-top: 20px;
+}
+
+.text-center {
+    text-align: center;
+}
