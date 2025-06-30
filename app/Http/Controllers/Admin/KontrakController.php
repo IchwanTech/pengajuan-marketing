@@ -8,8 +8,8 @@ use App\Models\User;
 use App\Services\NomorKontrakService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class KontrakController extends Controller
 {
@@ -103,138 +103,175 @@ class KontrakController extends Controller
     public function show($id)
     {
         $suratKontrak = SuratKontrak::find($id);
+        $angsuran = $this->generateAngsuran($suratKontrak);
+        $pdf = $this->generatePdf($suratKontrak, $angsuran);
 
+        return $pdf->stream('Kontrak an ' . $suratKontrak->nama . '.pdf');
+    }
+
+    private function generateAngsuran($suratKontrak)
+    {
         $angsuran = [];
         $tanggalMulai = Carbon::parse($suratKontrak->tanggal_jatuh_tempo)->locale('id');
 
-        // Jika tipe kontrak adalah "Borongan" atau "Borongan BPJS", gunakan sistem per 2 minggu
-        if (in_array($suratKontrak->type, ['Borongan', 'Borongan BPJS'])) {
-            $jatuhTempo = (int) $tanggalMulai->format('d');
-            $tanggal = $tanggalMulai->copy();
-
-            for ($i = 1; $i <= $suratKontrak->tenor; $i++) {
-                // Inisialisasi tanggal mulai dan selesai
-                if ($jatuhTempo === 27) {
-                    if ($i % 2 == 1) {
-                        // Periode pertama atau ganjil: 27 -> 10 (bulan berikutnya)
-                        $tanggalMulai = $tanggal->copy()->day(27);
-                        $tanggalSelesai = $tanggalMulai->copy()->addMonthNoOverflow()->day(10);
-                    } else {
-                        // Periode genap: 11 -> 26
-                        $tanggalMulai = $tanggal->copy()->day(11);
-                        $tanggalSelesai = $tanggalMulai->copy()->day(26);
-                    }
-                } elseif ($jatuhTempo === 11) {
-                    if ($i % 2 == 1) {
-                        // Periode pertama atau ganjil: 11 -> 26
-                        $tanggalMulai = $tanggal->copy()->day(11);
-                        $tanggalSelesai = $tanggalMulai->copy()->day(26);
-                    } else {
-                        // Periode genap: 27 -> 10 (bulan berikutnya)
-                        $tanggalMulai = $tanggal->copy()->day(27);
-                        $tanggalSelesai = $tanggalMulai->copy()->addMonthNoOverflow()->day(10);
-                    }
-                }
-
-                $angsuran[] = [
-                    'tanggal_mulai' => $tanggalMulai->translatedFormat('d M Y'),
-                    'tanggal_selesai' => $tanggalSelesai->translatedFormat('d M Y'),
-                    'cicilan' => $suratKontrak->cicilan
-                ];
-
-                // Update $tanggal ke periode berikutnya
-                $tanggal = $tanggalSelesai->copy()->addDay();
-            }
+        if ($this->isBoronganType($suratKontrak->type)) {
+            $angsuran = $this->generateBoronganAngsuran($suratKontrak, $tanggalMulai);
         } else {
-            // Jika bukan borongan, sistem bulanan
-            for ($i = 1; $i <= $suratKontrak->tenor; $i++) {
-                $angsuran[] = [
-                    'tanggal' => $tanggalMulai->translatedFormat('d F Y'),
-                    'cicilan' => $suratKontrak->cicilan
-                ];
-                $tanggalMulai->addMonth();
+            $angsuran = $this->generateBulananAngsuran($suratKontrak, $tanggalMulai);
+        }
+
+        return $angsuran;
+    }
+
+    private function isBoronganType($type)
+    {
+        return in_array($type, ['Borongan', 'Borongan BPJS']);
+    }
+
+    private function generateBoronganAngsuran($suratKontrak, $tanggalMulai)
+    {
+        $angsuran = [];
+        $jatuhTempo = (int) $tanggalMulai->format('d');
+        $tanggal = $tanggalMulai->copy();
+
+        for ($i = 1; $i <= $suratKontrak->tenor; $i++) {
+            $periode = $this->calculateBoronganPeriode($jatuhTempo, $i, $tanggal);
+
+            $angsuran[] = [
+                'tanggal_mulai' => $periode['mulai']->translatedFormat('d M Y'),
+                'tanggal_selesai' => $periode['selesai']->translatedFormat('d M Y'),
+                'cicilan' => $suratKontrak->cicilan
+            ];
+
+            // Update tanggal ke periode berikutnya
+            $tanggal = $periode['selesai']->copy()->addDay();
+        }
+
+        return $angsuran;
+    }
+
+    private function calculateBoronganPeriode($jatuhTempo, $iterasi, $tanggal)
+    {
+        $tanggalMulai = null;
+        $tanggalSelesai = null;
+
+        if ($jatuhTempo === 27) {
+            if ($iterasi % 2 == 1) {
+                // Periode ganjil: 27 -> 10 (bulan berikutnya)
+                $tanggalMulai = $tanggal->copy()->day(27);
+                $tanggalSelesai = $tanggalMulai->copy()->addMonthNoOverflow()->day(10);
+            } else {
+                // Periode genap: 11 -> 26
+                $tanggalMulai = $tanggal->copy()->day(11);
+                $tanggalSelesai = $tanggalMulai->copy()->day(26);
+            }
+        } elseif ($jatuhTempo === 11) {
+            if ($iterasi % 2 == 1) {
+                // Periode ganjil: 11 -> 26
+                $tanggalMulai = $tanggal->copy()->day(11);
+                $tanggalSelesai = $tanggalMulai->copy()->day(26);
+            } else {
+                // Periode genap: 27 -> 10 (bulan berikutnya)
+                $tanggalMulai = $tanggal->copy()->day(27);
+                $tanggalSelesai = $tanggalMulai->copy()->addMonthNoOverflow()->day(10);
             }
         }
 
-        $pdf = [];
+        return [
+            'mulai' => $tanggalMulai,
+            'selesai' => $tanggalSelesai
+        ];
+    }
 
-        $type = $suratKontrak->type;
+    private function generateBulananAngsuran($suratKontrak, $tanggalMulai)
+    {
+        $angsuran = [];
+        $currentDate = $tanggalMulai->copy();
+        $originalDay = $tanggalMulai->day; // Simpan tanggal asli (misal: 30)
 
-        switch ($type) {
-            case 'Internal':
-                $pdf = Pdf::loadView('admin.kontrak.template-internal', compact('suratKontrak', 'angsuran'));
-                break;
+        // DEBUG: Log tanggal awal 
+        // Log::info('Tanggal awal: ' . $currentDate->format('d-m-Y'));
+        // Log::info('Original day: ' . $originalDay);
 
-            case 'Internal BPJS':
-                $pdf = Pdf::loadView('admin.kontrak.template-internal-bpjs', compact('suratKontrak', 'angsuran'));
-                break;
+        for ($i = 1; $i <= $suratKontrak->tenor; $i++) {
+            // add array list ke angsuran (penting biar februarinya ga keskip atau ditimpa)
+            $angsuran[] = [
+                'tanggal' => $currentDate->translatedFormat('d F Y'),
+                'cicilan' => $suratKontrak->cicilan
+            ];
 
-            case 'Borongan':
-                $pdf = Pdf::loadView('admin.kontrak.template-borongan', compact('suratKontrak', 'angsuran'));
-                break;
+            // DEBUG: Log Iterasi looping buat ngeliat februari bener-bener ada di iterasi atau engga (alias ga ketiban)
+            // Log::info("Iterasi {$i}: " . $currentDate->format('d-m-Y'));
 
-            case 'Borongan BPJS':
-                $pdf = Pdf::loadView('admin.kontrak.template-borongan-bpjs', compact('suratKontrak', 'angsuran'));
-                break;
+            // Lanjut ke Next Month
+            $nextMonth = $currentDate->month + 1;
+            $nextYear = $currentDate->year;
 
-            case 'Kedinasan':
-                $pdf = Pdf::loadView('admin.kontrak.template-kedinasan', compact('suratKontrak', 'angsuran'));
-                break;
+            // Handle pergantian tahun
+            if ($nextMonth > 12) {
+                $nextMonth = 1;
+                $nextYear++;
+            }
 
-            case 'Kedinasan & Agunan':
-                $pdf = Pdf::loadView('admin.kontrak.template-kedinasan-agunan', compact('suratKontrak', 'angsuran'));
-                break;
+            // Adjust tanggal balik ke original variabel yang di input diawal
+            // ini berfungsi biar next month ga ngecopy value bulan februari yang di adjust nilainya (mentok 28)
+            $adjustedDay = $this->getAdjustedDay($originalDay, $nextMonth, $nextYear);
 
-            case 'Kedinasan & Taspen':
-                $pdf = Pdf::loadView('admin.kontrak.template-kedinasan-taspen', compact('suratKontrak', 'angsuran'));
-                break;
+            // DEBUG: Log Semua kalkulasinya (nampilin seluruh data yang bisa dibilang udah clean)
+            // Log::info("Next: {$nextYear}-{$nextMonth}, Adjusted day: {$adjustedDay}");
 
-            case 'PT Luar':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'PT Luar Agunan':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf-agunan', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'PT Luar BPJS':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf-bpjs', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'PT Luar BPJS Agunan':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf-bpjs-agunan', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'PT SF':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'PT SF Agunan':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf-agunan', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'PT SF BPJS':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf-bpjs', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'PT SF BPJS Agunan':
-                $pdf = Pdf::loadView('admin.kontrak.template-luar-sf-bpjs-agunan', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'UMKM':
-                $pdf = Pdf::loadView('admin.kontrak.template-umkm', compact('suratKontrak', 'angsuran'));
-                break;
-
-            case 'UMKM Agunan':
-                $pdf = Pdf::loadView('admin.kontrak.template-umkm-agunan', compact('suratKontrak', 'angsuran'));
-                break;
-
-            default:
-                $pdf = Pdf::loadView('admin.template-kontrak', compact('suratKontrak', 'angsuran'));
-                break;
+            $currentDate = Carbon::create($nextYear, $nextMonth, $adjustedDay)->locale('id');
         }
 
-        return $pdf->stream('Kontrak an ' . $suratKontrak->nama . '.pdf');
+        // DEBUG: Log hasil akhir
+        Log::info('Total angsuran: ' . count($angsuran));
+        foreach ($angsuran as $key => $item) {
+            Log::info("Angsuran " . ($key + 1) . ": " . $item['tanggal']);
+        }
+
+        return $angsuran;
+    }
+
+    private function getAdjustedDay($originalDay, $month, $year)
+    {
+        // Khusus Februari
+        if ($month == 2) {
+            $isLeapYear = $year % 4 == 0 && ($year % 100 != 0 || $year % 400 == 0);
+            $maxDayInFeb = $isLeapYear ? 29 : 28;
+
+            return min($originalDay, $maxDayInFeb);
+        }
+
+        // Bulan lain: pakai tanggal asli, tapi sesuaikan dengan max hari di bulan tersebut
+        $daysInMonth = Carbon::create($year, $month, 1)->daysInMonth;
+        return min($originalDay, $daysInMonth);
+    }
+
+    private function generatePdf($suratKontrak, $angsuran)
+    {
+        $templateMap = [
+            'Internal' => 'admin.kontrak.template-internal',
+            'Internal BPJS' => 'admin.kontrak.template-internal-bpjs',
+            'Borongan' => 'admin.kontrak.template-borongan',
+            'Borongan BPJS' => 'admin.kontrak.template-borongan-bpjs',
+            'Kedinasan' => 'admin.kontrak.template-kedinasan',
+            'Kedinasan & Agunan' => 'admin.kontrak.template-kedinasan-agunan',
+            'Kedinasan & Taspen' => 'admin.kontrak.template-kedinasan-taspen',
+            'PT Luar' => 'admin.kontrak.template-luar-sf',
+            'PT Luar Agunan' => 'admin.kontrak.template-luar-sf-agunan',
+            'PT Luar BPJS' => 'admin.kontrak.template-luar-sf-bpjs',
+            'PT Luar BPJS Agunan' => 'admin.kontrak.template-luar-sf-bpjs-agunan',
+            'PT SF' => 'admin.kontrak.template-luar-sf',
+            'PT SF Agunan' => 'admin.kontrak.template-luar-sf-agunan',
+            'PT SF BPJS' => 'admin.kontrak.template-luar-sf-bpjs',
+            'PT SF BPJS Agunan' => 'admin.kontrak.template-luar-sf-bpjs-agunan',
+            'UMKM' => 'admin.kontrak.template-umkm',
+            'UMKM Agunan' => 'admin.kontrak.template-umkm-agunan',
+        ];
+
+        $template = $templateMap[$suratKontrak->type] ?? 'admin.template-kontrak';
+
+        return Pdf::loadView($template, compact('suratKontrak', 'angsuran'));
     }
 
     public function update(Request $request, $id, NomorKontrakService $nomorKontrakService)
