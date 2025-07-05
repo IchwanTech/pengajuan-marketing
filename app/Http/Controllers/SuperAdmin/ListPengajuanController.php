@@ -57,8 +57,8 @@ class ListPengajuanController extends Controller
                 'pekerjaan',
                 'pengajuan'
             ])
-            ->get()
-            ->sortBy('pengajuan.created_at'); // Urutkan data berdasarkan tanggal terbaru
+            // ->orderBy('pengajuan.created_at') // Urutkan data berdasarkan tanggal terbaru
+            ->paginate(10);
 
         return view('superAdmin.list-pengajuan', compact('riwayat', 'availableYears'));
     }
