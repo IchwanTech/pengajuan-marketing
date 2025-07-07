@@ -872,38 +872,29 @@
         setInterval(updateDateTime, 1000);
 
         $(document).ready(function() {
-            // $('#myTable').DataTable({
-            //     responsive: false, // Membuat tabel responsif
-            //     scrollX: true,
-            //     pagingType: "simple_numbers", // Menggunakan pagination dengan First, Previous, Next, Last
-            //     lengthMenu: [
-            //         [10, 25, 50, 100, -1],
-            //         [10, 25, 50, 100, "Semua"]
-            //     ],
-            //     language: {
-            //         search: "Cari:",
-            //         lengthMenu: "Tampilkan _MENU_ entri",
-            //         info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-            //         infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
-            //         infoFiltered: "(disaring dari total _MAX_ entri)",
-            //         paginate: {
-            //             first: "<<", // Tombol pertama
-            //             last: ">>", // Tombol terakhir
-            //             next: ">",
-            //             previous: "<"
-            //         },
-            //         zeroRecords: "Tidak ada data yang ditemukan",
-            //         emptyTable: "Tidak ada data tersedia di tabel"
-            //     }
-            // });
             $('#myTable').DataTable({
-                paging: false,
-                searching: false,
-                info: false,
-                ordering: false,
+                responsive: false, // Membuat tabel responsif
                 scrollX: true,
-                responsive: true,
                 pagingType: "simple_numbers", // Menggunakan pagination dengan First, Previous, Next, Last
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "Semua"]
+                ],
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
+                    infoFiltered: "(disaring dari total _MAX_ entri)",
+                    paginate: {
+                        first: "<<", // Tombol pertama
+                        last: ">>", // Tombol terakhir
+                        next: ">",
+                        previous: "<"
+                    },
+                    zeroRecords: "Tidak ada data yang ditemukan",
+                    emptyTable: "Tidak ada data tersedia di tabel"
+                }
             });
             $('#myTable1').DataTable({
                 responsive: false, // Membuat tabel responsif
