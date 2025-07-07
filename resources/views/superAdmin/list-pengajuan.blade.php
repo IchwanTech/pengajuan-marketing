@@ -112,7 +112,7 @@
                             <tbody>
                                 @forelse ($riwayat as $data)
                                     <tr>
-                                        <td class="text-center align-middle">{{ $loop->iteration }}</td>
+                                        <td class="text-center align-middle">{{ $loop->index + $riwayat->firstItem() }}</td>
                                         <td>
                                             <div class="mb-1">
                                                 {{ $data->nama_lengkap }}
@@ -200,7 +200,14 @@
                                     </tr>
                                 @endforelse
                             </tbody>
+
                         </table>
+                        @if ($riwayat instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                            <div class="d-flex justify-content-center mt-4">
+                                {{ $riwayat->appends(request()->query())->links() }}
+                            </div>
+                        @endif
+
                     </div>
                 </div>
             </div>
