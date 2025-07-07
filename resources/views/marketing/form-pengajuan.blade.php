@@ -33,7 +33,9 @@
                     </div>
                     <div class="card-body">
                         <form id="loanForm" action="{{ route('marketing.form.store') }}" method="POST"
-                            enctype="multipart/form-data"
+                            enctype="multipart/form-data" 
+                            {{-- its really important to disable the submit button to prevent --}}
+                            multiple submissions
                             onsubmit="document.getElementById('submitBtn').disabled=true; document.getElementById('submitBtn').innerHTML='Submitting...';">
                             @csrf
                             <!-- Step 1: Informasi Nasabah -->
