@@ -33,7 +33,8 @@
                     </div>
                     <div class="card-body">
                         <form id="loanForm" action="{{ route('marketing.form.store') }}" method="POST"
-                            enctype="multipart/form-data">
+                            enctype="multipart/form-data"
+                            onsubmit="document.getElementById('submitBtn').disabled=true; document.getElementById('submitBtn').innerHTML='Submitting...';">
                             @csrf
                             <!-- Step 1: Informasi Nasabah -->
                             <div class="form-step form-step-active">
@@ -527,7 +528,7 @@
 
                                 <div class="text-end">
                                     <button type="button" class="btn btn-secondary prev-btn">Previous</button>
-                                    <button type="submit" class="btn btn-success">Submit</button>
+                                    <button type="submit" class="btn btn-success" id="submitBtn">Submit</button>
                                 </div>
                             </div>
                         </form>
