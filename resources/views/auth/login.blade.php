@@ -21,11 +21,11 @@
                     <div class="col-lg-4 mx-auto">
                         <div class="auth-form-light text-left p-5">
                             <div class="brand-logo">
-                                <img src="{{ asset('assets/images/logo.svg') }}">
+                                <img src="{{ asset('assets/images/sandbox.png') }}">
                             </div>
                             <h4>Welcome back!</h4>
                             <h6 class="font-weight-light">Sign in to continue.</h6>
-                            <form method="POST" action="{{ route('login') }}" class="pt-3">
+                            <form method="POST" action="{{ route('login.auth') }}" class="pt-3">
                                 @csrf
                                 <!-- Email Input -->
                                 <div class="form-group">

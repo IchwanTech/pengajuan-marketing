@@ -25,7 +25,7 @@
                             </div>
                             <h4>Create your account</h4>
                             <h6 class="font-weight-light">Fill in the details to register</h6>
-                            <form class="pt-3" method="POST" action="{{ route('register') }}">
+                            <form class="pt-3" method="POST" action="{{ route('register.auth') }}">
                                 @csrf
 
                                 <!-- Name -->

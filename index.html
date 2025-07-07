@@ -1,0 +1,34 @@
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                                    <button type="submit" class="btn btn-success submit-btn"
+                                        onclick="handleFormSubmit(this)">
+                                        <span class="btn-text">Submit</span>
+                                        <span class="btn-loading d-none">
+                                            <span class="spinner-border spinner-border-sm" role="status"
+                                                aria-hidden="true"></span>
+                                            Loading...
+                                        </span>
+                                    </button>
+
+                                    <script>
+                                        function handleFormSubmit(button) {
+                                            const btn = button;
+                                            btn.disabled = true;
+                                            btn.querySelector('.btn-text').classList.add('d-none');
+                                            btn.querySelector('.btn-loading').classList.remove('d-none');
+                                        }
+                                    </script>
+
+                                    <style>
+                                        .btn-loading {
+                                            display: inline-flex;
+                                            align-items: center;
+                                            gap: 5px;
+                                        }
+
+                                        .btn:disabled {
+                                            opacity: 0.7;
+                                            cursor: not-allowed;
+                                        }
+                                    </style>
+                                </div>

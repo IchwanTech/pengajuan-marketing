@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Nasabah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ListPengajuanController extends Controller
 {
@@ -14,20 +15,20 @@ class ListPengajuanController extends Controller
         $month = $request->input('month');
         $year = $request->input('year');
 
-        // Ambil tahun yang tersedia di tabel pengajuans
-        $availableYears = Nasabah::whereHas('pengajuan')
-            ->selectRaw('YEAR(created_at) as year')
-            ->whereNotNull('created_at')
+        // Optimasi: Menggunakan join untuk performa yang lebih baik
+        $availableYears = DB::table('nasabahs')
+            ->join('pengajuans', 'nasabahs.id', '=', 'pengajuans.nasabah_id')
+            ->selectRaw('YEAR(pengajuans.created_at) as year')
+            ->whereNotNull('pengajuans.created_at')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year');
 
+        // Query yang lebih efisien dengan eager loading
         $riwayat = Nasabah::whereHas('user', function ($query) {
             $query->where('usertype', 'marketing');
         })
             ->whereHas('pengajuan', function ($query) use ($filterTime, $month, $year) {
-                // $query->whereIn('status', ['aproved head', 'rejected head', 'approved banding head', 'rejected banding head']);
-
                 // Filter berdasarkan waktu
                 if ($filterTime == 'today') {
                     $query->whereDate('created_at', now());
@@ -55,21 +56,35 @@ class ListPengajuanController extends Controller
                 'keluarga',
                 'kerabat',
                 'pekerjaan',
-                'pengajuan'
+                'pengajuan' => function ($query) {
+                    $query->orderBy('created_at', 'desc');
+                }
             ])
-            ->get()
-            ->sortBy('pengajuan.created_at'); // Urutkan data berdasarkan tanggal terbaru
+            ->get();
+
+        // Optimasi: Sorting sudah dilakukan di level database, tidak perlu sortBy lagi
 
         return view('superAdmin.list-pengajuan', compact('riwayat', 'availableYears'));
     }
 
+
     public function show($id)
     {
-        // Cari data nasabah beserta relasinya
-        $nasabah = Nasabah::with(['user', 'alamat', 'jaminan', 'keluarga', 'kerabat', 'pekerjaan', 'pengajuan.approval'])
+        // Optimasi: Eager loading dengan ordering untuk pengajuan
+        $nasabah = Nasabah::with([
+            'user',
+            'alamat',
+            'jaminan',
+            'keluarga',
+            'kerabat',
+            'pekerjaan',
+            'pengajuan' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'pengajuan.approval'
+        ])
             ->findOrFail($id);
 
-        // Return view dengan data nasabah
         return view('superAdmin.detail-pengajuan', compact('nasabah'));
     }
 }

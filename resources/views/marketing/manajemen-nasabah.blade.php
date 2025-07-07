@@ -167,19 +167,32 @@
                                                     $data->pengajuan->is_banding == 0 &&
                                                         ($data->pengajuan->status == 'aproved head' || $data->pengajuan->status == 'rejected head'))
                                                     <div class="button-group d-flex gap-2">
-                                                        <button type="button" class="btn btn-gradient-danger btn-sm"
+                                                        <button type="button"
+                                                            class="btn btn-gradient-danger btn-sm banding-btn"
                                                             data-bs-toggle="modal" data-bs-target="#bandingModal"
                                                             data-id="{{ $data->pengajuan->id }}"
-                                                            data-id-marketing="{{ $data->marketing_id }}" data->
-                                                            Banding
+                                                            data-id-marketing="{{ $data->marketing_id }}"
+                                                            onclick="handleButtonLoading(this)">
+                                                            <span class="btn-text">Banding</span>
+                                                            <span class="btn-loading d-none">
+                                                                <span class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                                Loading...
+                                                            </span>
                                                         </button>
                                                         <form
                                                             action="{{ route('marketing.data.pengajuan.clear', $data->id) }}"
-                                                            method="POST">
+                                                            method="POST" onsubmit="handleFormSubmit(this)">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <button type="submit" class="btn btn-gradient-success btn-sm">
-                                                                Selesai
+                                                            <button type="submit"
+                                                                class="btn btn-gradient-success btn-sm selesai-btn">
+                                                                <span class="btn-text">Selesai</span>
+                                                                <span class="btn-loading d-none">
+                                                                    <span class="spinner-border spinner-border-sm"
+                                                                        role="status" aria-hidden="true"></span>
+                                                                    Loading...
+                                                                </span>
                                                             </button>
                                                         </form>
                                                     </div>
@@ -193,6 +206,35 @@
                                                 @else
                                                     <span class="badge badge-primary">Menunggu Approval</span>
                                                 @endif
+
+                                                <script>
+                                                    function handleButtonLoading(button) {
+                                                        const btn = button;
+                                                        btn.disabled = true;
+                                                        btn.querySelector('.btn-text').classList.add('d-none');
+                                                        btn.querySelector('.btn-loading').classList.remove('d-none');
+                                                    }
+
+                                                    function handleFormSubmit(form) {
+                                                        const submitBtn = form.querySelector('.selesai-btn');
+                                                        submitBtn.disabled = true;
+                                                        submitBtn.querySelector('.btn-text').classList.add('d-none');
+                                                        submitBtn.querySelector('.btn-loading').classList.remove('d-none');
+                                                    }
+                                                </script>
+
+                                                <style>
+                                                    .btn-loading {
+                                                        display: inline-flex;
+                                                        align-items: center;
+                                                        gap: 5px;
+                                                    }
+
+                                                    .btn:disabled {
+                                                        opacity: 0.7;
+                                                        cursor: not-allowed;
+                                                    }
+                                                </style>
                                             </td>
                                         </tr>
                                     @endforeach
