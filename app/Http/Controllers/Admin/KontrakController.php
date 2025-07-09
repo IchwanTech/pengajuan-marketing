@@ -106,7 +106,11 @@ class KontrakController extends Controller
         $angsuran = $this->generateAngsuran($suratKontrak);
         $pdf = $this->generatePdf($suratKontrak, $angsuran);
 
-        return $pdf->stream('Kontrak an ' . $suratKontrak->nama . '.pdf');
+        $filename = 'Kontrak an - ' . str_replace(['/', '\\', ','], '-', $suratKontrak->nama) . '.pdf';
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
     }
 
     private function generateAngsuran($suratKontrak)
@@ -249,8 +253,12 @@ class KontrakController extends Controller
 
     private function generatePdf($suratKontrak, $angsuran)
     {
+        $nama_nasabah = $suratKontrak->nama;
+        Log::info('Nama Nasabah: ' . $nama_nasabah); // Debug ke log
+
         $templateMap = [
             'Internal' => 'admin.kontrak.template-internal',
+            'Internal Agunan' => 'admin.kontrak.template-internal-agunan',
             'Internal BPJS' => 'admin.kontrak.template-internal-bpjs',
             'Borongan' => 'admin.kontrak.template-borongan',
             'Borongan BPJS' => 'admin.kontrak.template-borongan-bpjs',
