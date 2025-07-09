@@ -97,12 +97,12 @@
                 <tr>
                     <td style="width: 20%;">Nama</td>
                     <td style="width: 3%">:</td>
-                    <td>{{ Str::title($suratKontrak->nama) }}</td>
+                    <td> {{ $suratKontrak->nama }}</td>
                 </tr>
                 <tr>
                     <td style="width: 20%; vertical-align: top">Alamat</td>
                     <td style="width: 3%; vertical-align: top">:</td>
-                    <td style="text-align: justify; vertical-align: top">{{ Str::title($suratKontrak->alamat) }}
+                    <td style="text-align: justify; vertical-align: top">{{ $suratKontrak->alamat }}
                     </td>
                 </tr>
                 <tr>

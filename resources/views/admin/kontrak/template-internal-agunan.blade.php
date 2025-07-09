@@ -87,7 +87,7 @@
         </h3>
         <p style="text-align: center; margin-top: 0%; margin-bottom: 3%">No : {{ $suratKontrak->nomor_kontrak }}</p>
         <p style="margin-bottom:2%; text-align:justify;">Perjanjian
-            Pinjaman Tanpa Agunan ini merupakan fasilitas Grup
+            Pinjaman dengan Agunan ini merupakan fasilitas Grup
             Perusahaan
             dengan nama Cash Lentera Usaha CG termasuk syarat dan ketentuan khusus dan umumnya,
             <strong>perjanjian</strong> dibuat, oleh dan antara :
@@ -97,7 +97,7 @@
                 <tr>
                     <td style="width: 20%;">Nama</td>
                     <td style="width: 3%">:</td>
-                    <td>{{ Str::title($suratKontrak->nama) }}</td>
+                    <td>{{ $suratKontrak->nama }}</td>
                 </tr>
                 <tr>
                     <td style="width: 20%; vertical-align: top">Alamat</td>
@@ -211,8 +211,7 @@
                         </li>
                     </ol>
                 </li>
-                <br>
-                <br>
+
                 <li>
                     <strong>
                         <u>
@@ -222,10 +221,11 @@
                     <ol type="1" style="margin:0pt; padding-left:6%; text-align:justify;">
                         <li style="margin-bottom:5;">
                             <strong>Peminjam</strong> harus membayarkan jumlah pengembalian yang ditetapkan, dengan
-                            sistem transfer setiap bulan sesuai dengan jadwal pengembalian ke Rekening Financial
-                            <strong>Cash Lentera Usaha CG , BCA an Riska Ervia (572-555-665-6)</strong> atau ke Rekening
-                            <strong>BJB an Wendri (0146-332-7811-00)</strong>. Apabila telah melakukan Pembayaran harap
-                            mengirimkan bukti Transaksi ke <strong>Nomor Official CG (+62 822-9914-1811)</strong>.
+                            sistem
+                            pemotongan
+                            gaji <strong><em>(khusus peminjam internal grup perusahaan)</em></strong> sesuai dengan
+                            jadwal
+                            pengembalian.
                         </li>
                         <li style="margin-bottom:5;">
                             Prioritas pembayaran atas Perjanjian ini adalah sebagai berikut :</li>
@@ -241,7 +241,7 @@
                             <li><strong>Peminjam</strong> dapat mempercepat pelunasan seluruh pinjamannya sesuai dengan
                                 kebijakan dari <strong>Pemberi Pinjaman</strong></li>
                             <li>
-                                Jika <strong>Peminjam</strong> bermaksud mempercepat pelunasan pinjamannya yang belum
+                                <strong>Peminjam</strong> bermaksud mempercepat pelunasan pinjamannya yang belum
                                 lunas, <strong>Peminjam</strong> harus memberitahukan kepada <strong>Pemberi
                                     Pinjaman</strong>
                                 sebelum pelunasan paling lambat 3 (tiga) hari sebelum tanggal pembayaran dengan tetap
@@ -263,11 +263,23 @@
                         </u>
                     </strong>
                     <p style="margin-top: 0%; text-align: justify;">
-                        Berikut adalah proyeksi/perkiraan Skema Pembayaran Angsuran, yang menjadi acuan serta petunjuk
-                        cara pembayaran dan/atau dengan sistem pemotongan gaji sesuai dengan syarat dan ketentuan yang
-                        disetujui kedua belah pihak.
+                        Berikut adalah proyeksi/perkiraan Skema Pembayaran Angsuran, yang
+                        menjadi acuan serta petunjuk cara pembayaran dan/atau dengan 1sistem pemotongan gaji sesuai
+                        dengan
+                        syarat dan ketentuan yang disetujui kedua belah pihak.
                     </p>
-                    <p>Biaya Admin 1% dari Nominal Pokok Pinjaman</p>
+                    <ol type="1" style="text-align:justify;">
+                        <li>
+                            &lt;1 Juta = 10.000</li>
+                        <li>
+                            1.1 Juta &ndash; 3 Juta = 20.000</li>
+                        <li>
+                            3.1 Juta &ndash; 5 Juta = 40.000</li>
+                        <li>
+                            5.1 Juta &ndash; 10 Juta = 80.000</li>
+                        <li>
+                            10 juta Keatas = 100.000</li>
+                    </ol>
                     <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%;"><span
                             style="">&nbsp;</p>
                     <table>
@@ -338,6 +350,28 @@
                     <ol type="1" style="text-align: justify;">
                         <li style="margin-bottom:1%"><b>Peminjam</b> mengakui dan sepakat bahwa rincian dari <b>Pemberi
                                 Pinjaman</b> adalah rincian yang benar.</li>
+                        <li style="margin-bottom:1%">
+                            Bahwa <strong>Peminjam</strong> adalah karyawan yang terdaftar resmi dari Group Perusahaan
+                            dan pemotongan pinjaman berasal dari Potongan gaji setiap bulan dari
+                            <strong>Peminjam</strong>. Dan apabila
+                            <strong>Peminjam</strong> Resign Wajib memberitahuan kepada Pemberi Pinjaman Mininal H-1
+                            Bulan dari pengajuan resign. Dan apabila hal tersebut tidak dilakukan maka <strong>Pemberi
+                                Pinjaman</strong> berhak
+                            untuk melalukan pemotongan semua gaji yang tersisa dari perusahaan dengan atau tanpa
+                            persetujuan
+                            <strong>Peminjam</strong>.
+                        </li>
+                        <li style="margin-bottom:1%">
+                            Hal ini juga berlaku bagi Peminjam yang dinyatakan diberhentikan atau di Cut Off oleh
+                            perusahaan, maka <strong>Peminjam</strong> Wajib menginfokan kepada <strong>Pemberi
+                                Pinjaman</strong> 1 x 24
+                            Jam dari info yang diterima oleh Peminjam untuk memusyawarahkan keberlajutan dari sisa
+                            pinjaman. Dan
+                            apabila hal tersebut tidak dilakukan maka <strong>Pemberi Pinjaman</strong> berhak untuk
+                            melalukan pemotongan
+                            semua gaji yang tersisa dari perusahaan dengan atau tanpa persetujuan
+                            <strong>Peminjam</strong>.
+                        </li>
                         <li style="margin-bottom:1%">
                             Prioritas pembayaran atas Perjanjian perihal &ldquo;Denda&rdquo; dikenakan kepada
                             <strong>Peminjam</strong> yang bayar lewat dari tanggal <strong>Jatuh Tempo</strong> akan
@@ -425,8 +459,10 @@
 
         <table class="no-border" style="width:100%; border-collapse: collapse;">
             <tr>
-                <td colspan="3" style="text-align: center; padding: 15px;"><b>Peminjam</b></td>
-                <td colspan="3" style="text-align: center; padding: 15px;"><b>Team Cash Lentera Usaha CG</b></td>
+                <td colspan="3" style="text-align: left; padding-top: 15px; padding-bottom: 15px;"><b>Peminjam</b>
+                </td>
+                <td colspan="3" style="text-align: left; padding-top: 15px; padding-bottom: 15px;"><b>Team Cash
+                        Lentera Usaha CG</b></td>
             </tr>
             <tr>
                 <td style="padding-top: 50px; white-space: nowrap; width: 15%; text-align: left;">Tanda Tangan</td>

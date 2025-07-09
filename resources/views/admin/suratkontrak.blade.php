@@ -195,6 +195,7 @@
                                     <select name="type" id="type" class="form-select" required>
                                         <option value="">-- Pilih --</option>
                                         <option value="Internal">Internal</option>
+                                        <option value="Internal Agunan">Internal Agunan</option>
                                         <option value="Internal BPJS">Internal BPJS</option>
                                         <option value="Borongan">Borongan</option>
                                         <option value="Borongan BPJS">Borongan BPJS</option>
@@ -579,7 +580,7 @@
                     document.getElementById('editKedinasan').value = '';
                 }
 
-                if (type === 'Internal' || type === 'Internal BPJS') {
+                if (type === 'Internal' || type === 'Internal BPJS' || type === 'Internal Agunan') {
                     editGolonganGroup.style.display = 'block';
                 } else {
                     editGolonganGroup.style.display = 'none';
@@ -633,7 +634,7 @@
                             if (['Kedinasan & Taspen', 'Kedinasan', 'Kedinasan & Agunan'].includes(
                                     formData.get('type'))) {
                                 smallType.textContent = formData.get('kedinasan');
-                            } else if (['Internal', 'Internal BPJS'].includes(formData.get('type'))) {
+                            } else if (['Internal', 'Internal BPJS', 'Internal Agunans'].includes(formData.get('type'))) {
                                 const perusahaan = formData.get('perusahaan');
                                 const golongan = formData.get('golongan');
                                 smallType.textContent = `${perusahaan} - ${golongan}`;
@@ -797,7 +798,7 @@
 
             const toggleInternal = (value) => {
                 const golonganInput = document.getElementById('golongan');
-                if (value === 'Internal' || value === 'Internal BPJS') {
+                if (value === 'Internal' || value === 'Internal BPJS' || value === 'Internal Agunan') {
                     golonganGroup.style.display = 'block';
                 } else {
                     golonganGroup.style.display = 'none';
