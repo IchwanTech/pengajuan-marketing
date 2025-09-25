@@ -71,6 +71,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
+// asfko
 Route::middleware('auth', 'marketingMiddleware')->group(function () {
     Route::get('/marketing/dashboard', [MDashboardController::class, 'index'])->name('marketing.dashboard');
     Route::get('/marketing/data-pengajuan', [PengajuanController::class, 'index'])->name('marketing.data.pengajuan');
